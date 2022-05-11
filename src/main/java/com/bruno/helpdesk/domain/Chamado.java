@@ -58,6 +58,15 @@ public class Chamado implements Serializable {
 		this.tecnico = tecnico;
 		this.cliente = cliente;
 	}
+	
+	
+	
+	public Chamado() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+
 	public Integer getId() {
 		return id;
 	}

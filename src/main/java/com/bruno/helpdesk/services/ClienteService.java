@@ -10,58 +10,58 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.bruno.helpdesk.domain.Cliente;
 import com.bruno.helpdesk.domain.Pessoa;
-import com.bruno.helpdesk.domain.Tecnico;
-import com.bruno.helpdesk.domain.dtos.TecnicoDTO;
+import com.bruno.helpdesk.domain.dtos.ClienteDTO;
+import com.bruno.helpdesk.repositories.ClienteRepository;
 import com.bruno.helpdesk.repositories.PessoaRepository;
-import com.bruno.helpdesk.repositories.TecnicoRepository;
 import com.bruno.helpdesk.services.exceptions.ObjectNotFoundException;
 
 @Service
-public class TecnicoService {
+public class ClienteService {
 
 		@Autowired
-		private TecnicoRepository repository;
+		private ClienteRepository repository;
 		@Autowired
 		private PessoaRepository pessoaRepository;
 		
 		@Autowired
 		private BCryptPasswordEncoder encoder;
 		
-		public Tecnico findById(Integer id) {
-			Optional<Tecnico> obj = this.repository.findById(id);
+		public Cliente findById(Integer id) {
+			Optional<Cliente> obj = this.repository.findById(id);
 			return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado! id: " + id));
 		}
 
-		public List<Tecnico> findAll() {			
+		public List<Cliente> findAll() {			
 			return repository.findAll();
 		}
 
-		public Tecnico create(TecnicoDTO objDTO) {
+		public Cliente create(ClienteDTO objDTO) {
 			objDTO.setId(null);
 			objDTO.setSenha(encoder.encode(objDTO.getSenha()));
 			validaPorCpfEEmail(objDTO);
-			Tecnico newObj = new Tecnico(objDTO);
+			Cliente newObj = new Cliente(objDTO);
 			return repository.save(newObj);
 		}
 		
-		public Tecnico update(Integer id, @Valid TecnicoDTO objDTO) {
+		public Cliente update(Integer id, @Valid ClienteDTO objDTO) {
 			objDTO.setId(id);
-			Tecnico oldObj = findById(id);
+			Cliente oldObj = findById(id);
 			validaPorCpfEEmail(objDTO);
-			oldObj = new Tecnico(objDTO);
+			oldObj = new Cliente(objDTO);
 			return repository.save(oldObj);
 		}
 		
 		public void delete(Integer id) {
-			Tecnico obj = findById(id);
+			Cliente obj = findById(id);
 			if(obj.getChamados().size() > 0 ) {
-				throw new DataIntegrityViolationException("O Técnico possui ordens de serviço e não pode ser deletado!");
+				throw new DataIntegrityViolationException("O Cliente possui ordens de serviço e não pode ser deletado!");
 			}
 			repository.deleteById(id);			
 		}
 
-		private void validaPorCpfEEmail(TecnicoDTO objDTO) {
+		private void validaPorCpfEEmail(ClienteDTO objDTO) {
 			Optional<Pessoa> obj = pessoaRepository.findByCpf(objDTO.getCpf());
 			if(obj.isPresent() && obj.get().getId() != objDTO.getId()) {
 				throw new DataIntegrityViolationException("CPF já cadastrado no sistema!");
